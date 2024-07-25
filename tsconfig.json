@@ -9,7 +9,8 @@
     "skipLibCheck": true,
     "types": ["jest"],
     "allowSyntheticDefaultImports": true,
-    "allowJs": true // JavaScript 파일을 허용하도록 설정
+    "allowJs": true, // JavaScript 파일을 허용하도록 설정
+    "module": "esnext"
   },
   "include": ["src/**/*", "screens/**/*"],
   "exclude": [
