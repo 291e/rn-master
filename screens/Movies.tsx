@@ -3,13 +3,15 @@ import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
-  ScrollView,
-  StyleSheet,
+  FlatList,
+  RefreshControl,
+  View,
 } from "react-native";
 import styled from "styled-components/native";
 import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
-import Poster from "../components/Poster";
+import VMedia from "../components/VMedia";
+import HMedia from "../components/HMedia";
 
 interface Movie {
   adult: boolean;
@@ -57,41 +59,24 @@ const ListTitle = styled.Text`
   margin-left: 30px;
 `;
 
-const TrendingScroll = styled.ScrollView`
+const TrendingScroll = styled.FlatList`
   margin-top: 20px;
-`;
-
-const Movie = styled.View`
-  margin-right: 20px;
-  align-items: center;
-`;
-
-const Title = styled.Text`
-  font-weight: 600;
-  margin-top: 7px;
-  margin-bottom: 5px;
-`;
-const Votes = styled.Text`
-  font-size: 10px;
-  opacity: 80;
 `;
 
 const ListContainer = styled.View`
   margin-bottom: 40px;
 `;
 
-const HMovie = styled.View`
-  padding: 0 30px;
-  flex-direction: row;
+const ComingSoonTitle = styled(ListTitle)`
+  margin-bottom: 20px;
 `;
-
-const HColumn = styled.View``;
 
 const Movies: React.FC<NativeStackScreenProps<any, "movies">> = () => {
   const [loading, setLoading] = useState(true);
   const [nowPlaying, setNowPlaying] = useState<Movie[]>([]);
   const [upcoming, setUpconming] = useState<Movie[]>([]);
   const [trending, setTrending] = useState<Movie[]>([]);
+  const [refreshing, setRefreshing] = useState(false);
 
   const getTrending = async () => {
     const url = "https://api.themoviedb.org/3/trending/movie/week?";
@@ -158,13 +143,24 @@ const Movies: React.FC<NativeStackScreenProps<any, "movies">> = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await getData();
+    setRefreshing(false);
+  };
   return loading ? (
     <Loader>
       <ActivityIndicator />
     </Loader>
   ) : (
-    <Container>
+    <Container
+      refreshControl={
+        <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+      }
+    >
       <Swiper
+        horizontal
         loop
         autoplay
         showsButtons={false}
@@ -173,7 +169,7 @@ const Movies: React.FC<NativeStackScreenProps<any, "movies">> = () => {
         containerStyle={{
           width: "100%",
           height: SCREEN_HEIGHT / 4,
-          marginBottom: 30,
+          marginBottom: 40,
         }}
       >
         {nowPlaying.map((movie) => (
@@ -187,38 +183,53 @@ const Movies: React.FC<NativeStackScreenProps<any, "movies">> = () => {
           />
         ))}
       </Swiper>
-      <ListTitle>Trending Movies</ListTitle>
+      <ListTitle>현재 상영작</ListTitle>
+      <TrendingScroll
+        contentContainerStyle={{ paddingHorizontal: 30 }}
+        keyExtractor={(item) => item.id + ""}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        ItemSeparatorComponent={() => <View style={{ width: 30 }} />}
+        data={trending}
+        renderItem={({ item }) => (
+          <VMedia
+            poster_Path={item.poster_path}
+            originalTitle={item.original_title}
+            voteAverage={item.vote_average}
+          />
+        )}
+      />
       <ListContainer>
-        <TrendingScroll
+        {/* <TrendingScroll
           contentContainerStyle={{ paddingLeft: 30 }}
           horizontal
           showsHorizontalScrollIndicator={false}
         >
           {trending.map((movie) => (
-            <Movie key={movie.id}>
-              <Poster path={movie.poster_path}></Poster>
-              <Title>
-                {movie.original_title.slice(0, 13)}
-                {movie.original_title.length > 13 ? "..." : null}
-              </Title>
-              <Votes>
-                {movie.vote_average > 0
-                  ? `⭐️${movie.vote_average.toFixed(1)}/10`
-                  : `Coming Soon`}
-              </Votes>
-            </Movie>
+            <VMedia
+              key={movie.id}
+              poster_Path={movie.poster_path}
+              originalTitle={movie.original_title}
+              voteAverage={movie.vote_average}
+            />
           ))}
-        </TrendingScroll>
+        </TrendingScroll> */}
       </ListContainer>
-      <ListTitle>Coming Soon</ListTitle>
-      {upcoming.map((movie) => (
-        <HMovie key={movie.id}>
-          <Poster path={movie.poster_path} />
-          <HColumn>
-            <Title></Title>
-          </HColumn>
-        </HMovie>
-      ))}
+      <ComingSoonTitle>출시 예정작</ComingSoonTitle>
+      <FlatList
+        keyExtractor={(item) => item.id + ""}
+        ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+        data={upcoming}
+        renderItem={({ item }) => (
+          <HMedia
+            key={item.id}
+            poster_Path={item.poster_path}
+            originalTitle={item.original_title}
+            overview={item.overview}
+            releaseDate={item.release_date}
+          />
+        )}
+      />
     </Container>
   );
 };
