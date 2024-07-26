@@ -5,8 +5,9 @@ import Tv from "../screens/Tv";
 import Search from "../screens/Search";
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { RootTabParams } from "../navigationType";
 
-const Tab = createBottomTabNavigator();
+const Tab = createBottomTabNavigator<RootTabParams>();
 
 const Tabs = () => (
   <Tab.Navigator
@@ -21,7 +22,7 @@ const Tabs = () => (
     }}
   >
     <Tab.Screen
-      name="Movis"
+      name="Movies"
       component={Movies}
       options={{
         tabBarIcon: ({ color, size }) => {

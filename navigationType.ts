@@ -1,5 +1,5 @@
-export type RootStackParams = {
-  movies: {
-    id: number;
-  };
+export type RootTabParams = {
+  Movies: undefined;
+  Search: undefined;
+  Tv: undefined;
 };

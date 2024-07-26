@@ -5,9 +5,14 @@ import { useFonts } from "expo-font";
 import { Ionicons } from "@expo/vector-icons";
 import { useAssets } from "expo-asset";
 import { NavigationContainer } from "@react-navigation/native";
-import Tabs from "./navigation/Tabs";
-import Stack from "./navigation/Stack";
 import Root from "./navigation/Root";
+import {
+  QueryClient,
+  QueryClientProvider,
+  useQuery,
+} from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -24,8 +29,10 @@ export default function App() {
   }
 
   return (
-    <NavigationContainer onReady={onLayoutRootView}>
-      <Root />
-    </NavigationContainer>
+    <QueryClientProvider client={queryClient}>
+      <NavigationContainer onReady={onLayoutRootView}>
+        <Root />
+      </NavigationContainer>
+    </QueryClientProvider>
   );
 }
