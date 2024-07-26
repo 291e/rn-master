@@ -154,83 +154,68 @@ const Movies: React.FC<NativeStackScreenProps<any, "movies">> = () => {
       <ActivityIndicator />
     </Loader>
   ) : (
-    <Container
-      refreshControl={
-        <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+    <FlatList
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+      ListHeaderComponent={
+        <>
+          <Swiper
+            horizontal
+            loop
+            autoplay
+            showsButtons={false}
+            showsPagination={false}
+            autoplayTimeout={3.5}
+            containerStyle={{
+              width: "100%",
+              height: SCREEN_HEIGHT / 4,
+              marginBottom: 40,
+            }}
+          >
+            {nowPlaying.map((movie) => (
+              <Slide
+                key={movie.id}
+                backdrop_path={movie.backdrop_path}
+                poster_path={movie.poster_path}
+                original_title={movie.original_title}
+                vote_average={movie.vote_average}
+                overview={movie.overview}
+              />
+            ))}
+          </Swiper>
+          <ListTitle>현재 상영작</ListTitle>
+          <TrendingScroll
+            contentContainerStyle={{ paddingHorizontal: 30 }}
+            keyExtractor={(item) => item.id + ""}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            ItemSeparatorComponent={() => <View style={{ width: 30 }} />}
+            data={trending}
+            renderItem={({ item }) => (
+              <VMedia
+                poster_Path={item.poster_path}
+                originalTitle={item.original_title}
+                voteAverage={item.vote_average}
+              />
+            )}
+          />
+          <ListContainer></ListContainer>
+          <ComingSoonTitle>출시 예정작</ComingSoonTitle>
+        </>
       }
-    >
-      <Swiper
-        horizontal
-        loop
-        autoplay
-        showsButtons={false}
-        showsPagination={false}
-        autoplayTimeout={3.5}
-        containerStyle={{
-          width: "100%",
-          height: SCREEN_HEIGHT / 4,
-          marginBottom: 40,
-        }}
-      >
-        {nowPlaying.map((movie) => (
-          <Slide
-            key={movie.id}
-            backdrop_path={movie.backdrop_path}
-            poster_path={movie.poster_path}
-            original_title={movie.original_title}
-            vote_average={movie.vote_average}
-            overview={movie.overview}
-          />
-        ))}
-      </Swiper>
-      <ListTitle>현재 상영작</ListTitle>
-      <TrendingScroll
-        contentContainerStyle={{ paddingHorizontal: 30 }}
-        keyExtractor={(item) => item.id + ""}
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        ItemSeparatorComponent={() => <View style={{ width: 30 }} />}
-        data={trending}
-        renderItem={({ item }) => (
-          <VMedia
-            poster_Path={item.poster_path}
-            originalTitle={item.original_title}
-            voteAverage={item.vote_average}
-          />
-        )}
-      />
-      <ListContainer>
-        {/* <TrendingScroll
-          contentContainerStyle={{ paddingLeft: 30 }}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          {trending.map((movie) => (
-            <VMedia
-              key={movie.id}
-              poster_Path={movie.poster_path}
-              originalTitle={movie.original_title}
-              voteAverage={movie.vote_average}
-            />
-          ))}
-        </TrendingScroll> */}
-      </ListContainer>
-      <ComingSoonTitle>출시 예정작</ComingSoonTitle>
-      <FlatList
-        keyExtractor={(item) => item.id + ""}
-        ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
-        data={upcoming}
-        renderItem={({ item }) => (
-          <HMedia
-            key={item.id}
-            poster_Path={item.poster_path}
-            originalTitle={item.original_title}
-            overview={item.overview}
-            releaseDate={item.release_date}
-          />
-        )}
-      />
-    </Container>
+      keyExtractor={(item) => item.id + ""}
+      ItemSeparatorComponent={() => <View style={{ height: 20 }} />}
+      data={upcoming}
+      renderItem={({ item }) => (
+        <HMedia
+          key={item.id}
+          poster_Path={item.poster_path}
+          originalTitle={item.original_title}
+          overview={item.overview}
+          releaseDate={item.release_date}
+        />
+      )}
+    />
   );
 };
 export default Movies;
